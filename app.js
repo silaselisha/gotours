@@ -3,6 +3,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 
 const toursRouter = require('./routes/tours');
+const errorHandler = require('./controllers/error-handler');
 
 const app = express();
 
@@ -15,5 +16,6 @@ process.env.NODE_ENV === 'development' ? app.use(morgan('dev')) : '';
  * @mounting routes
  */
 app.use('/api/v1/tours', toursRouter);
+app.use(errorHandler);
 
 module.exports = app;

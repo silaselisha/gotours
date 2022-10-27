@@ -3,7 +3,7 @@ const path = require('path');
 
 const express = require('express');
 
-const AppError = require('../utils/app-error');
+const AppError = require('../utils/app-errors');
 const catchAsync = require('../utils/catch-async');
 
 const router = express.Router();

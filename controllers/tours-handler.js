@@ -4,7 +4,7 @@ const AppError = require('../utils/app-errors');
 
 const getAllTours = (catchAsync(async (req, res, next) => {
     const queryObject = {...req.query};
-    const excludedItems = ['limit', 'fields', 'sort', 'page'];
+    const excludedItems = ['limits', 'fields', 'sort', 'page'];
 
     excludedItems.forEach((item) => delete queryObject[item]);
 
@@ -23,7 +23,17 @@ const getAllTours = (catchAsync(async (req, res, next) => {
         query = query.sort('-createdAt');
     }
 
-    const tours = await query
+    /**
+     * @limiting
+     */
+    if(req.query.limits) {
+        const queryLimiter = req.query.limits.split(',').join(' ');
+        query = query.select(queryLimiter);
+    }else {
+        query = query.select('-__v');
+    }
+
+    const tours = await query;
 
     res.status(200).json({
         status: 'success',

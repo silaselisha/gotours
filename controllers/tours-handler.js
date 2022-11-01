@@ -1,9 +1,18 @@
 const Tour = require('../models/tour-model');
-const catchAsync = require("../utils/catch-async");
+const catchAsync = require('../utils/catch-async');
 const AppError = require('../utils/app-errors');
 
 const getAllTours = (catchAsync(async (req, res, next) => {
-    const tours = await Tour.find({});
+    const queryObject = {...req.query};
+    const excludedItems = ['limit', 'fields', 'sort', 'page'];
+
+    excludedItems.forEach((item) => delete queryObject[item]);
+
+    let queryString = JSON.stringify(queryObject);
+    queryString = queryString.replace(/\b(gt|gte|lt|lte)\b/g, (item) => `$${item}`);
+
+    let query = Tour.find(JSON.parse(queryString));
+    const tours = await query
 
     res.status(200).json({
         status: 'success',

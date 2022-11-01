@@ -29,22 +29,27 @@ const TourSchema = new mongoose.Schema({
         type: Number,
         min: [1, 'ratings avearge should be equal to 1 or greater than 1'],
         max: [5, 'ratings avearge should be equal to 5 or less than 5'],
+        default: 4.5,
     },
     ratingsQuantity: {
         type: Number,
+        default: 0,
     },
     price: {
         type: Number,
         required: [true, 'tour should have a price'],
     },
+    priceDiscount: {
+        type: Number
+    },
     summary: {
         type: String,
         trim: true,
+        required: [true, 'tour should have a detailed description'],
     },
     description: {
         type: String,
         trim: true,
-        required: [true, 'tour should have a detailed description'],
     },
     imageCover: {
         type: String,
@@ -52,6 +57,11 @@ const TourSchema = new mongoose.Schema({
     },
     images: [String],
     startDates: [Date],
+    createdAt: {
+        type: Date,
+        default: Date.now(),
+    },
+    startDates: [Date]
 });
 
 const Tour = mongoose.model('Tour', TourSchema);

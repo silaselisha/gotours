@@ -33,6 +33,16 @@ const getAllTours = (catchAsync(async (req, res, next) => {
         query = query.select('-__v');
     }
 
+    /**
+     * @pagination
+     */
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 3;
+    console.log(page, limit)
+    const skip = (page - 1) * limit;
+    
+    query = query.skip(skip).limit(limit);
+    
     const tours = await query;
 
     res.status(200).json({

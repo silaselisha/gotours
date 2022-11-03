@@ -2,6 +2,16 @@ const Tour = require('../models/tour-model');
 const catchAsync = require('../utils/catch-async');
 const AppError = require('../utils/app-errors');
 
+const cheapTopFiveTours = ((req, res, next) => {
+    const limit = 5;
+
+    req.query.limit = limit.toString();
+    req.query.sort = '-ratingsAverage,price';
+    req.query.limits = 'name,price,ratingsAverage,duration,difficulty,summary';
+
+    next();
+});
+
 const getAllTours = (catchAsync(async (req, res, next) => {
     const queryObject = {...req.query};
     const excludedItems = ['limits', 'fields', 'sort', 'page'];
@@ -115,7 +125,8 @@ const toursHandlers = {
     getTour,
     updateTour,
     deleteTour,
-    createTour
+    createTour,
+    cheapTopFiveTours
 }
 
 module.exports = toursHandlers;

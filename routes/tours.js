@@ -1,7 +1,7 @@
 const express = require('express');
 
 const toursHandlers = require('../controllers/tours-handler');
-const {createTour, cheapTopFiveTours,deleteTour, getAllTours, getTour, updateTour, } = toursHandlers;
+const {createTour, cheapTopFiveTours,deleteTour, getAllTours, getTour, getStats, getToursMonthlyPlan,updateTour, } = toursHandlers;
 const router = express.Router();
 
 router.route('/top-five-cheap-tours')
@@ -10,6 +10,13 @@ router.route('/top-five-cheap-tours')
 router.route('/')
     .get(getAllTours)
     .post(createTour)
+
+
+router.route('/tours-stats')
+    .get(getStats)
+
+router.route('/tours-monthly-plan/:year')
+    .get(getToursMonthlyPlan)
 
 router.route('/:tourId')
     .get(getTour)

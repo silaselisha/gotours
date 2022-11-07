@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 const TourSchema = new mongoose.Schema({
     name: {
@@ -61,7 +62,54 @@ const TourSchema = new mongoose.Schema({
         type: Date,
         default: Date.now(),
     },
+    slug: String,
+    secrete: {
+        type: Boolean,
+        default: false
+    },
+    discount: {
+        type: Number,
+        validate: {
+            validator: function() {
+                return this.discount < this.price;
+            },
+            message: 'discount should be less than the price'
+        }
+    },
     startDates: [Date]
+}, {
+    toJSON: {virtuals: true},
+    toObject: {virtuals: true}
+});
+
+/**
+ * @Hooks
+ * @PreHooks
+ * @PostHooks
+ * @Vitrual properties
+ */
+TourSchema.virtual('weeks').get(function() {
+    return parseFloat(this.duration / 7).toPrecision(2) * 1;
+});
+
+TourSchema.pre('save', function(next) {
+    this.slug = slugify(this.name, {
+        lower: true
+    });
+
+    next();
+});
+
+TourSchema.pre(/^find/, function(next) {
+    this.find({secrete: {$ne: true}});
+
+    next();
+});
+
+TourSchema.pre('aggregate', function(next) {
+    this.pipeline().unshift({$match: {secrete: {$ne: true}}});
+
+    next();
 });
 
 const Tour = mongoose.model('Tour', TourSchema);

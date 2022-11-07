@@ -4,6 +4,8 @@
   "description": "Tour web application",
   "main": "server.js",
   "scripts": {
+    "start:delete": "node ./utils/db-seeder --delete",
+    "start:seed": "node ./utils/db-seeder --seed",
     "start:dev": "nodemon server.js",
     "start": "node server.js"
   },
@@ -17,6 +19,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "mongoose": "^6.7.0"
+    "mongoose": "^6.7.0",
+    "slugify": "^1.6.5",
+    "validator": "^13.7.0"
   }
 }

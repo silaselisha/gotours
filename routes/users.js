@@ -9,6 +9,8 @@ const router = express.Router();
 router.route('/signup')
     .post(signUp);
 
+router.post('/login', login);
+
 router.route('/')
     .get(getUsers)
 

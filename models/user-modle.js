@@ -12,6 +12,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: [true, 'user email address is required!'],
         unique: [true, 'user email is taken!'],
+        lowercase: true,
         trim: true,
         validate: [validator.isEmail, 'provide a valid email address']
     },
@@ -50,11 +51,12 @@ const UserSchema = new mongoose.Schema({
     }
 }, {
     toJSON: {virtuals: true},
-    toObject: {virtuals: true}
+    toObject: { virtuals: true}
 });
 
 /**
  * @Encrypt passwords
+ * @Instance methods
  */
 UserSchema.pre('save', async function(next) {
     if(!this.isModified('password')) return next();
@@ -63,6 +65,10 @@ UserSchema.pre('save', async function(next) {
     this.confirmPassword = undefined;
     next();
 });
+
+UserSchema.methods.validatePassword = async function (passwordToTest, encryptedPassword) {
+    return await bcrypt.compare(passwordToTest, encryptedPassword);
+}
 
 const User = mongoose.model('User', UserSchema);
 

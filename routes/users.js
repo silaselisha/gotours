@@ -1,11 +1,16 @@
 const express = require('express');
-const {getUser, getUsers, updateUser, deleteUser, createUser} = require('../controllers/users-handler');
+const {getUser, getUsers, updateUser, deleteUser} = require('../controllers/users-handler');
+const authenticate = require('../controllers/authenticate');
+
+const {signUp, login} = authenticate;
 
 const router = express.Router();
 
+router.route('/signup')
+    .post(signUp);
+
 router.route('/')
     .get(getUsers)
-    .post(createUser)
 
 router.route('/:id')
     .get(getUser)

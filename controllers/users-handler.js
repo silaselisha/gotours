@@ -57,32 +57,11 @@ const deleteUser = catchAsync(async (req, res, next) => {
     });
 });
 
-const createUser = catchAsync(async (req, res, next) => {
-    const {name, email, password, confirmPassword} = req.body;
-
-    const user = await User.create({
-        name,
-        email,
-        password,
-        confirmPassword
-    });
-
-    if(!user) {
-        return next(new AppError('Error occured during creation of a new user account!', 400));
-    }
-
-    res.status(201).json({
-        status: 'success',
-        data: user
-    });
-});
-
 const usersHandlers = {
     getUser,
     getUsers,
     updateUser,
-    deleteUser,
-    createUser
+    deleteUser
 };
 
 module.exports = usersHandlers;

@@ -18,8 +18,8 @@ const seed = async () => {
 
         const users_data = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'dev-data', 'users.json'), 'utf-8'));
 
-        await Tour.create(tours_data); 
-        await User.create(users_data);
+        // await Tour.create(tours_data); 
+        // await User.create(users_data);
         console.log('Data successfully uploaded...')
     } catch (err) {
         console.log(err.message)
@@ -29,7 +29,7 @@ const seed = async () => {
 
 const unseed = async () => {
     try {
-        await Tour.deleteMany({});
+        // await Tour.deleteMany({});
         await User.deleteMany({});
         console.log('Data successfully deleted...')
     } catch (err) {

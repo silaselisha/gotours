@@ -61,9 +61,8 @@ const updateTour = catchAsync(async (req, res, next) => {
         new: true,
         runValidators: true
     });
-    console.log(tour);
+    
     if (!tour) {
-        console.log(tour);
         return next(new AppError('Tour was not found!', 404));
     }
 

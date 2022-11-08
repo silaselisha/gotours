@@ -7,15 +7,19 @@ dotenv.config({path: path.join(__dirname, '../', '.env')});
 const mongoose = require('mongoose');
 
 const Tour = require('../models/tour-model');
+const User = require('../models/user-modle');
 
 const password = process.env.DATABASE_PASSWORD;
 const database = process.env.DATABASE_URI.replace('<password>', password);
 
 const seed = async () => {
     try {
-        const data = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'dev-data', 'tours.json'), 'utf-8'));
+        const tours_data = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'dev-data', 'tours.json'), 'utf-8'));
 
-        await Tour.create(data); 
+        const users_data = JSON.parse(fs.readFileSync(path.join(__dirname, '../', 'dev-data', 'users.json'), 'utf-8'));
+
+        await Tour.create(tours_data); 
+        await User.create(users_data);
         console.log('Data successfully uploaded...')
     } catch (err) {
         console.log(err.message)
@@ -26,6 +30,7 @@ const seed = async () => {
 const unseed = async () => {
     try {
         await Tour.deleteMany({});
+        await User.deleteMany({});
         console.log('Data successfully deleted...')
     } catch (err) {
         console.log(err.message);
@@ -39,7 +44,7 @@ if(process.argv[2] === '--seed' || process.argv[2] === '-s') {
     unseed();
 }
 
-mongoose.connect(database).then((connect) => {
+mongoose.connect(database).then(() => {
     console.log('Database connection succesfully established...');
 }).catch(() => {
     console.log('Database connection unsuccessfully established..!');

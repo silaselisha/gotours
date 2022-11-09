@@ -23,6 +23,10 @@ const handleValidation = (err) => {
     return new AppError(message, 400);
 }
 
+const handleTokenExpiredError = () => new AppError('Invalid token! Please login or signup.', 401);
+
+const handleJsonWebTokenError = () => new AppError('Invalid token! Please login or signup.', 401);
+
 const sendToClient = (err, res) => {
     if(err.isOperational) {
         res.status(err.statusCode).json({
@@ -55,9 +59,11 @@ const errorHandler = (err, req, res, next) => {
         sentToDeveloper(err, res);
     } else if (process.env.NODE_ENV === 'production') {
         let error = {...err};
-        if (err.name === 'CastError') error = handleCastError(err);
-        if (err.code === 11000) error = handleDuplicates(err);
-        if (err.name === 'ValidationError') error = handleValidation(err);
+        if (error.name === 'CastError') error = handleCastError(err);
+        if (error.code === 11000) error = handleDuplicates(err);
+        if (error.name === 'ValidationError') error = handleValidation(err);
+        if (error.name === 'TokenExpiredError') error = handleTokenExpiredError();
+        if (error.name === 'JsonWebTokenError') error = handleJsonWebTokenError();
 
         sendToClient(error, res);
     }

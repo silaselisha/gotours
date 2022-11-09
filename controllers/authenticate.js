@@ -55,7 +55,7 @@ const login = catchAsync(async (req, res, next) => {
 
 const protect = catchAsync(async (req, res, next) => {
     let token = '';
-    
+
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(' ')[1];
     }
@@ -67,11 +67,11 @@ const protect = catchAsync(async (req, res, next) => {
     const decode = await promisify(jwt.verify)(token, process.env.JWT_PRIVATE_KEY);
 
     const currentUser = await User.findById(decode.id);
-    if(!currentUser) {
+    if (!currentUser) {
         return next(new AppError('Please login or signup!', 401));
     }
-   
-    if(currentUser.checkForUpdatedPasswords(decode.iat)) {
+
+    if (currentUser.checkForUpdatedPasswords(decode.iat)) {
         return next(new AppError('Password was recently changed, please login again!', 401));
     }
 

@@ -45,6 +45,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         deafult: true
     },
+    passwordChangedAt: Date,
     createdAt: {
         type: Date,
         default: Date.now(),
@@ -70,6 +71,11 @@ UserSchema.methods.validatePassword = async function (passwordToTest, encryptedP
     return await bcrypt.compare(passwordToTest, encryptedPassword);
 }
 
+UserSchema.methods.checkForUpdatedPasswords = function(jwt_timestamp) {
+    const timeStamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+
+    return timeStamp > jwt_timestamp ? true : false;
+}
 const User = mongoose.model('User', UserSchema);
 
 module.exports = User;

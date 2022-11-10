@@ -2,7 +2,7 @@ const express = require('express');
 const {getUser, getUsers, updateUser, deleteUser} = require('../controllers/users-handler');
 const authenticate = require('../controllers/authenticate');
 
-const {signUp, login} = authenticate;
+const {signUp, login, protect, restrict} = authenticate;
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ router.route('/signup')
 router.post('/login', login);
 
 router.route('/')
-    .get(getUsers)
+    .get(protect, restrict('admin', 'lead-guide'), getUsers)
 
 router.route('/:id')
     .get(getUser)

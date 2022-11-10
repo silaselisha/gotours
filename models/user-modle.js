@@ -84,8 +84,8 @@ UserSchema.methods.validatePassword = async function (passwordToTest, encryptedP
 }
 
 UserSchema.methods.checkForUpdatedPasswords = function(jwt_timestamp) {
-    const timeStamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
-
+    const timeStamp = parseInt(this.passwordChangedAt?.getTime() / 1000, 10);
+   
     return timeStamp > jwt_timestamp ? true : false;
 }
 

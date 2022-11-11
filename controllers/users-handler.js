@@ -1,12 +1,11 @@
 const crypto = require('crypto');
 
-const jwt = require('jsonwebtoken');
-
 const User = require('../models/user-modle');
 const AppError = require('../utils/app-errors');
 const catchAsync = require('../utils/catch-async');
 const sendMail = require('../utils/send-mails');
 const jwtTokenGen = require('../utils/jwt-gen');
+const dataSanitizer = require('../utils/data-filter');
 
 const getUsers = catchAsync(async (req, res, next) => {
     const users = await User.find({});
@@ -138,10 +137,32 @@ const updatePassword = catchAsync(async (req, res, next) => {
     await user.save({validateBeforeSave: true});
 
     const token = jwtTokenGen(user._id);
-    
+
     res.status(200).json({
         status: 'success',
         token
+    });
+});
+
+const updateUsersData = catchAsync(async (req, res, next) => {
+    if(req.body.password || req.body.confirmPassword) {
+        return next(new AppError('Please use reset password!', 400))
+    }
+    
+    const sanitizedDataObject = dataSanitizer(req.body, 'name', 'email');
+
+    const user = await User.findByIdAndUpdate(req.user._id, sanitizedDataObject, {
+        runValidators: true,
+        new: true
+    });
+
+    if (!user) {
+        return next(new AppError('Please login to your account to update your account details!', 400));
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data: user
     });
 });
 
@@ -152,7 +173,8 @@ const usersHandlers = {
     deleteUser,
     forgortPassword,
     resetPassword,
-    updatePassword
+    updatePassword,
+    updateUsersData
 };
 
 module.exports = usersHandlers;

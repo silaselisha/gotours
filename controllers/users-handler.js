@@ -6,6 +6,7 @@ const User = require('../models/user-modle');
 const AppError = require('../utils/app-errors');
 const catchAsync = require('../utils/catch-async');
 const sendMail = require('../utils/send-mails');
+const jwtTokenGen = require('../utils/jwt-gen');
 
 const getUsers = catchAsync(async (req, res, next) => {
     const users = await User.find({});
@@ -115,10 +116,29 @@ const resetPassword = catchAsync(async (req, res, next) => {
 
     await user.save();
 
-    const token = jwt.sign({id: user._id}, process.env.JWT_PRIVATE_KEY, {
-        expiresIn: process.env.JWT_EXPIRES_IN
-    });
+    const token = jwtTokenGen(user._id);
 
+    res.status(200).json({
+        status: 'success',
+        token
+    });
+});
+
+const updatePassword = catchAsync(async (req, res, next) => {
+    const user = await User.findById(req.user._id).populate('password');
+
+    const {currentPassword, password, confirmPassword} = req.body
+
+    if(!await user.validatePassword(currentPassword, user.password)) {
+        return next(new AppError('Incorrect password! Please try again.', 400));
+    }
+
+    user.password = password;
+    user.confirmPassword = confirmPassword;
+    await user.save({validateBeforeSave: true});
+
+    const token = jwtTokenGen(user._id);
+    
     res.status(200).json({
         status: 'success',
         token
@@ -131,7 +151,8 @@ const usersHandlers = {
     updateUser,
     deleteUser,
     forgortPassword,
-    resetPassword
+    resetPassword,
+    updatePassword
 };
 
 module.exports = usersHandlers;

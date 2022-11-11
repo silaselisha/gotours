@@ -1,5 +1,5 @@
 const express = require('express');
-const {getUser, getUsers, updateUser, deleteUser, forgortPassword, resetPassword, updatePassword, updateUsersData} = require('../controllers/users-handler');
+const {getUser, getUsers, updateUser, deleteUser, forgortPassword, resetPassword, updatePassword, updateUsersData, deleteAccount} = require('../controllers/users-handler');
 const authenticate = require('../controllers/authenticate');
 
 const {signUp, login, protect} = authenticate;
@@ -12,6 +12,7 @@ router.post('/forgot-password', forgortPassword);
 router.patch('/reset-password/:resetToken', resetPassword);
 router.patch('/update-password', protect, updatePassword);
 router.patch('/update-user-account', protect, updateUsersData);
+router.delete('/delete-account', protect, deleteAccount);
 
 router.route('/')
     .get(getUsers)

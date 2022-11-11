@@ -166,6 +166,20 @@ const updateUsersData = catchAsync(async (req, res, next) => {
     });
 });
 
+const deleteAccount = catchAsync(async (req, res, next) => {
+    await User.findByIdAndUpdate(req.user._id, {
+        active: false
+    }, {
+        runValidators: true,
+        new: true
+    });
+
+    res.status(204).json({
+        status: 'success',
+        data: null
+    });
+});
+
 const usersHandlers = {
     getUser,
     getUsers,
@@ -174,7 +188,8 @@ const usersHandlers = {
     forgortPassword,
     resetPassword,
     updatePassword,
-    updateUsersData
+    updateUsersData,
+    deleteAccount
 };
 
 module.exports = usersHandlers;

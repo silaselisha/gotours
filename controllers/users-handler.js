@@ -6,6 +6,7 @@ const catchAsync = require('../utils/catch-async');
 const sendMail = require('../utils/send-mails');
 const jwtTokenGen = require('../utils/jwt-gen');
 const dataSanitizer = require('../utils/data-filter');
+const sendToken = require('../utils/send-token');
 
 const getUsers = catchAsync(async (req, res, next) => {
     const users = await User.find({});
@@ -115,12 +116,7 @@ const resetPassword = catchAsync(async (req, res, next) => {
 
     await user.save();
 
-    const token = jwtTokenGen(user._id);
-
-    res.status(200).json({
-        status: 'success',
-        token
-    });
+    sendToken(200, user, res);
 });
 
 const updatePassword = catchAsync(async (req, res, next) => {
@@ -136,12 +132,7 @@ const updatePassword = catchAsync(async (req, res, next) => {
     user.confirmPassword = confirmPassword;
     await user.save({validateBeforeSave: true});
 
-    const token = jwtTokenGen(user._id);
-
-    res.status(200).json({
-        status: 'success',
-        token
-    });
+   sendToken(200, user, res);
 });
 
 const updateUsersData = catchAsync(async (req, res, next) => {

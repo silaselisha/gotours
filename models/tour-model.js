@@ -98,7 +98,10 @@ const TourSchema = new mongoose.Schema({
         day: Number,
         description: String
     }],
-    guides: Array,
+    guides: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+    }],
 }, {
     toJSON: {virtuals: true},
     toObject: {virtuals: true}
@@ -122,10 +125,11 @@ TourSchema.pre('save', function(next) {
     next();
 });
 
-TourSchema.pre('save', async function(next) {
-    const guidesPromise = this.guides.map(async (id) => await User.findById(id));
-
-    this.guides = await Promise.all(guidesPromise);
+TourSchema.pre(/^find/, async function(next) {
+    this.populate({
+        path: 'guides',
+        select: '-__v -passwordChangedAt'
+    })
     next()
 });
 

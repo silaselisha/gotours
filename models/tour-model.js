@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const User = require('./user-modle');
 
 const TourSchema = new mongoose.Schema({
     name: {
@@ -76,7 +77,28 @@ const TourSchema = new mongoose.Schema({
             message: 'discount should be less than the price'
         }
     },
-    startDates: [Date]
+    startDates: [Date],
+    startLocation: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point',
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+    },
+    locations: [{
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'point',
+        },
+        coordinates: [Number],
+        day: Number,
+        description: String
+    }],
+    guides: Array,
 }, {
     toJSON: {virtuals: true},
     toObject: {virtuals: true}
@@ -98,6 +120,13 @@ TourSchema.pre('save', function(next) {
     });
 
     next();
+});
+
+TourSchema.pre('save', async function(next) {
+    const guidesPromise = this.guides.map(async (id) => await User.findById(id));
+
+    this.guides = await Promise.all(guidesPromise);
+    next()
 });
 
 TourSchema.pre(/^find/, function(next) {

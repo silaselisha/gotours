@@ -1,7 +1,7 @@
 const express = require('express');
 const authenticate = require('../controllers/authenticate');
 
-const {protect} = authenticate;
+const {protect, restrict} = authenticate;
 
 const toursHandlers = require('../controllers/tours-handler');
 const {createTour, cheapTopFiveTours,deleteTour, getAllTours, getTour, getStats, getToursMonthlyPlan,updateTour, } = toursHandlers;
@@ -18,11 +18,11 @@ router.route('/tours-monthly-plan/:year')
 
 router.route('/')
     .get(getAllTours)
-    .post(protect, createTour)
+    .post(protect, restrict('admin'), createTour)
 
 router.route('/:tourId')
     .get(getTour)
-    .patch(protect, updateTour)
-    .delete(protect, deleteTour)
+    .patch(protect, restrict('admin'), updateTour)
+    .delete(protect, restrict('admin'), deleteTour)
 
 module.exports = router;

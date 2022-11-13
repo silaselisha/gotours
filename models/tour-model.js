@@ -76,7 +76,27 @@ const TourSchema = new mongoose.Schema({
             message: 'discount should be less than the price'
         }
     },
-    startDates: [Date]
+    startDates: [Date],
+    startLocation: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point',
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+    },
+    locations: [{
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'point',
+        },
+        coordinates: [Number],
+        day: Number,
+        description: String
+    }]
 }, {
     toJSON: {virtuals: true},
     toObject: {virtuals: true}

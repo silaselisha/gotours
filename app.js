@@ -9,6 +9,7 @@ const hpp = require('hpp');
 
 const toursRouter = require('./routes/tours');
 const usersRouter = require('./routes/users');
+const reviewsRouter = require('./routes/reviews');
 const errorHandler = require('./controllers/error-handler');
 const AppError = require('./utils/app-errors');
 
@@ -37,6 +38,7 @@ process.env.NODE_ENV === 'development' ? app.use(morgan('dev')) : '';
 app.use('/api', rateLimiter);
 app.use('/api/v1/tours', toursRouter);
 app.use('/api/v1/users', usersRouter);
+app.use('/api/v1/reviews', reviewsRouter);
 
 app.use('*', (req, res, next) => {
     next(new AppError('Route not implemented', 500));

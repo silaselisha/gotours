@@ -45,7 +45,8 @@ const UserSchema = new mongoose.Schema({
     photo: String,
     active: {
         type: String,
-        deafult: true
+        deafult: true,
+        select: false,
     },
     passwordChangedAt: Date,
     createdAt: {
@@ -76,6 +77,12 @@ UserSchema.pre('save', function(next) {
     if(!this.isModified('password') || this.isNew) return next();
 
     this.passwordChangedAt = Date.now() + 1000;
+    next();
+});
+
+UserSchema.pre(/^find/, function(next) {
+    this.find({active: {$ne: false}});
+    
     next();
 });
 

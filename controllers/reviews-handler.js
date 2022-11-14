@@ -21,7 +21,10 @@ const createReview = catchAsync(async (req, res, next) => {
 });
 
 const getAllReviews = catchAsync(async (req, res, next) => {
-    const features = new ApiFeatures(Review.find(), req.query)
+    let toursId = {};
+    if(req.params.tourId) toursId = {tour: req.params.tourId};
+
+    const features = new ApiFeatures(Review.find(toursId), req.query)
                         .filtering()
                         .limitFields()
                         .sorting()

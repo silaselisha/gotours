@@ -117,6 +117,12 @@ TourSchema.virtual('weeks').get(function() {
     return parseFloat(this.duration / 7).toPrecision(2) * 1;
 });
 
+TourSchema.virtual('reviews', {
+    ref: 'Review',
+    foreignField: 'tour',
+    localField: '_id'
+});
+
 TourSchema.pre('save', function(next) {
     this.slug = slugify(this.name, {
         lower: true
@@ -125,7 +131,7 @@ TourSchema.pre('save', function(next) {
     next();
 });
 
-TourSchema.pre(/^find/, async function(next) {
+TourSchema.pre(/^find/, function(next) {
     this.populate({
         path: 'guides',
         select: '-__v -passwordChangedAt'

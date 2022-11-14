@@ -29,6 +29,15 @@ const ReviewSchema = new mongoose.Schema({
     toObject: {virtuals: true}
 });
 
+ReviewSchema.pre(/^find/, function(next) {
+    this.populate({
+        path: 'user',
+        select: 'name photo'
+    });
+    
+    next();
+});
+
 const Review = mongoose.model('Review', ReviewSchema);
 
 module.exports = Review;

@@ -1,5 +1,6 @@
 const express = require('express');
 const authenticate = require('../controllers/authenticate');
+const {createReview} = require('../controllers/reviews-handler');
 
 const {protect, restrict} = authenticate;
 
@@ -24,5 +25,8 @@ router.route('/:tourId')
     .get(getTour)
     .patch(protect, restrict('admin'), updateTour)
     .delete(protect, restrict('admin'), deleteTour)
+
+router.route('/:tourId/reviews')
+    .post(protect, restrict('user'), createReview)
 
 module.exports = router;

@@ -4,7 +4,7 @@ const {createReview, getAllReviews, getReview, updateReview, deleteReview} = req
 const authenticate = require('../controllers/authenticate');
 const {protect, restrict} = authenticate;
 
-const router = express.Router();
+const router = express.Router({mergeParams: true});
 
 router.route('/')
     .get(getAllReviews)

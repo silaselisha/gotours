@@ -22,11 +22,11 @@ router.route('/tours-monthly-plan/:year')
 
 router.route('/')
     .get(getAllTours)
-    .post(protect, restrict('admin'), createTour)
+    .post(protect, restrict('admin', 'lead-guide'), createTour)
 
 router.route('/:tourId')
     .get(getTour)
-    .patch(protect, restrict('admin'), updateTour)
-    .delete(protect, restrict('admin'), deleteTour)
+    .patch(protect, restrict('admin', 'lead-guide'), updateTour)
+    .delete(protect, restrict('admin', 'lead-guide'), deleteTour)
 
 module.exports = router;

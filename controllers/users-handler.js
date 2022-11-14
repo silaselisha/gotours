@@ -171,6 +171,15 @@ const deleteAccount = catchAsync(async (req, res, next) => {
     });
 });
 
+const myAccount = catchAsync(async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+
+    res.status(200).json({
+        status: 'success',
+        data: user
+    });
+});
+
 const usersHandlers = {
     getUser,
     getUsers,
@@ -180,7 +189,8 @@ const usersHandlers = {
     resetPassword,
     updatePassword,
     updateUsersData,
-    deleteAccount
+    deleteAccount,
+    myAccount
 };
 
 module.exports = usersHandlers;

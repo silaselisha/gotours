@@ -11,7 +11,7 @@ router.route('/')
     .post(protect, restrict('user'), createReview);
 
 router.route('/:id')
-    .get(protect, restrict('user', 'admin'), getReview)
+    .get(getReview)
     .delete(protect, restrict('user', 'admin'), deleteReview)
     .patch(protect, restrict('user', 'admin'), updateReview);
 

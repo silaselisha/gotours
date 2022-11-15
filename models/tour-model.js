@@ -107,6 +107,10 @@ const TourSchema = new mongoose.Schema({
     toObject: {virtuals: true}
 });
 
+
+TourSchema.index({price: 1, ratingsAverage: -1});
+TourSchema.index({slug: 1});
+
 /**
  * @Hooks
  * @PreHooks

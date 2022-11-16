@@ -152,7 +152,9 @@ TourSchema.pre(/^find/, function(next) {
 });
 
 TourSchema.pre('aggregate', function(next) {
-    this.pipeline().unshift({$match: {secrete: {$ne: true}}});
+    if(!this.pipeline()[0]['$geoNear']) {
+        this.pipeline().unshift({$match: {secrete: {$ne: true}}});
+    }
 
     next();
 });

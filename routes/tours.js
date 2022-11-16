@@ -5,7 +5,7 @@ const reviewsRouter = require('./reviews');
 const {protect, restrict} = authenticate;
 
 const toursHandlers = require('../controllers/tours-handler');
-const {createTour, cheapTopFiveTours,deleteTour, getAllTours, getTour, getStats, getToursMonthlyPlan,updateTour, getToursWithin} = toursHandlers;
+const {createTour, cheapTopFiveTours,deleteTour, getAllTours, getTour, getStats, getToursMonthlyPlan,updateTour, getToursWithin, getToursNearMe} = toursHandlers;
 
 const router = express.Router();
 
@@ -17,8 +17,10 @@ router.route('/top-five-cheap-tours')
 router.route('/tours-stats')
     .get(protect, getStats)
 
-router.route('/tours-within/:distance/center/:lnglt/unit/:unit')
+router.route('/tours-within/:distance/center/:lnglat/unit/:unit')
     .get(getToursWithin)
+
+router.route('/tours-near-me/:lnglat').get(getToursNearMe)
 
 router.route('/tours-monthly-plan/:year')
     .get(protect, getToursMonthlyPlan)

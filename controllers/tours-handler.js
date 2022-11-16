@@ -141,15 +141,50 @@ const getToursMonthlyPlan = catchAsync(async(req, res, next) => {
 });
 
 const getToursWithin = catchAsync(async (req, res, next) => {
-    const {distance, lnglt, unit} = req.params;
-    const [lng, lt] = lnglt.split(',');
+    const {distance, lnglat, unit} = req.params;
+    const [lat, lng] = lnglat.split(',');
     const radius = unit === 'mi' ? distance / 3958.8 : distance / 6371;
   
-    if(!lng || !lt) {
+    if(!lng || !lat) {
         return next(new AppError('Longitude or Latitude are missing!', 400));
     }
-    
-    const tours = await Tour.find({startLocation: {$geoWithin: {$center: [[lng, lt], radius]}}});
+
+    const tours = await Tour.find({startLocation: {$geoWithin: {$center: [[lng, lat], radius]}}});
+
+    res.status(200).json({
+        status: 'success',
+        results: tours.length,
+        data: tours
+    });
+});
+
+const getToursNearMe = catchAsync(async (req, res, next) => {
+    const [lat, lng] = req.params.lnglat.split(',');
+    const unit = req.query.unit;
+
+    if(!lng || !lat) {
+        return next(new AppError('Longitude or Latitude are missing!', 400));
+    }
+
+    const multiplier = unit === 'mil' ? 0.000621371 : 0.001; 
+    const tours = await Tour.aggregate([
+        {
+            $geoNear: {
+                near: {
+                    type: 'Point',
+                    coordinates: [lng * 1, lat * 1]
+                },
+                distanceField: 'distance',
+                distanceMultiplier: multiplier
+            }
+        }, 
+        {
+            $project: {
+                distance: 1,
+                name: 1
+            }
+        }
+    ]);
 
     res.status(200).json({
         status: 'success',
@@ -161,6 +196,7 @@ const getToursWithin = catchAsync(async (req, res, next) => {
 const toursHandlers = {
     getAllTours,
     getToursWithin,
+    getToursNearMe,
     getTour,
     getStats,
     getToursMonthlyPlan,

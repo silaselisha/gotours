@@ -140,8 +140,27 @@ const getToursMonthlyPlan = catchAsync(async(req, res, next) => {
     });
 });
 
+const getToursWithin = catchAsync(async (req, res, next) => {
+    const {distance, lnglt, unit} = req.params;
+    const [lng, lt] = lnglt.split(',');
+    const radius = unit === 'mi' ? distance / 3958.8 : distance / 6371;
+  
+    if(!lng || !lt) {
+        return next(new AppError('Longitude or Latitude are missing!', 400));
+    }
+    
+    const tours = await Tour.find({startLocation: {$geoWithin: {$center: [[lng, lt], radius]}}});
+
+    res.status(200).json({
+        status: 'success',
+        results: tours.length,
+        data: tours
+    });
+});
+
 const toursHandlers = {
     getAllTours,
+    getToursWithin,
     getTour,
     getStats,
     getToursMonthlyPlan,

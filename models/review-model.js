@@ -30,6 +30,17 @@ const ReviewSchema = new mongoose.Schema({
     toObject: {virtuals: true}
 });
 
+ReviewSchema.index({tour: 1, user: 1}, {unique: true});
+
+ReviewSchema.pre(/^find/, function(next) {
+    this.populate({
+        path: 'user',
+        select: 'name photo'
+    });
+    
+    next();
+});
+
 /**
  * @calculate reviews
  * @ratingsAverage
@@ -56,13 +67,23 @@ ReviewSchema.statics.calculateReviews = async function(toursId) {
         }
     ]);
 
-    await Tour.findByIdAndUpdate(toursId, {
-        ratingsAverage: reviewsData[0].ratingsAverage,
-        ratingsQuantity: reviewsData[0].ratingsQuantity
-    }, {
-        new: true,
-        runValidator: true
-    });
+    if(reviewsData.length > 0) {
+        await Tour.findByIdAndUpdate(toursId, {
+            ratingsAverage: reviewsData[0].ratingsAverage,
+            ratingsQuantity: reviewsData[0].ratingsQuantity
+        }, {
+            new: true,
+            runValidator: true
+        });
+    }else {
+        await Tour.findByIdAndUpdate(toursId, {
+            ratingsAverage: 4.5,
+            ratingsQuantity: 1
+        }, {
+            new: true,
+            runValidator: true
+        });
+    }
 }
 
 ReviewSchema.post('save', function(docs, next) {
@@ -71,12 +92,16 @@ ReviewSchema.post('save', function(docs, next) {
     next();
 });
 
-ReviewSchema.pre(/^find/, function(next) {
-    this.populate({
-        path: 'user',
-        select: 'name photo'
-    });
-    
+
+ReviewSchema.pre(/^findOneAnd/,  async function(next) {
+    this.rev = await this.findOne().clone();
+
+    next();
+});
+
+ReviewSchema.post(/^findOneAnd/, async function(docs, next) {
+    this.rev.constructor.calculateReviews(docs.tour);
+
     next();
 });
 

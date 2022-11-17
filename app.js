@@ -1,3 +1,5 @@
+const path = require('path');
+
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
@@ -10,11 +12,12 @@ const hpp = require('hpp');
 const toursRouter = require('./routes/tours');
 const usersRouter = require('./routes/users');
 const reviewsRouter = require('./routes/reviews');
+const routesRouter = require('./routes/routes');
 const errorHandler = require('./controllers/error-handler');
 const AppError = require('./utils/app-errors');
-
 const app = express();
-app.use(helmet());
+
+app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 app.use(cors());
 app.use(xss());
 app.use(express.json({limit: '10kb'}));
@@ -22,6 +25,11 @@ app.use(mongoSanitize());
 app.use(hpp({
     whitelist: ['duration', 'ratingsAverage', 'ratingsQuantity', 'price', 'maxGroupSize', 'difficulty']
 }));
+
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 const rateLimiter = rateLimit({
     max: 100,
@@ -35,6 +43,8 @@ process.env.NODE_ENV === 'development' ? app.use(morgan('dev')) : '';
 /**
  * @mounting routes
  */
+app.use('/', routesRouter);
+
 app.use('/api', rateLimiter);
 app.use('/api/v1/tours', toursRouter);
 app.use('/api/v1/users', usersRouter);

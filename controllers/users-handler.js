@@ -180,6 +180,17 @@ const myAccount = catchAsync(async (req, res, next) => {
     });
 });
 
+const logout = catchAsync(async (req, res, next) => {
+    res.cookie('jwt', 'token', {
+        httpOnly: true,
+        expires: new Date(Date.now() + 10 * 1000)
+    });
+
+    res.status(200).json({
+        status: 'success'
+    });
+});
+
 const usersHandlers = {
     getUser,
     getUsers,
@@ -190,7 +201,8 @@ const usersHandlers = {
     updatePassword,
     updateUsersData,
     deleteAccount,
-    myAccount
+    myAccount,
+    logout
 };
 
 module.exports = usersHandlers;

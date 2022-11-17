@@ -41,6 +41,8 @@ const protect = catchAsync(async (req, res, next) => {
 
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         token = req.headers.authorization.split(' ')[1];
+    }else if(req.cookies.jwt) {
+        token = req.cookies.jwt;
     }
 
     if (!token) {
@@ -62,6 +64,29 @@ const protect = catchAsync(async (req, res, next) => {
     next();
 });
 
+const isLoggedIn = async (req, res, next) => {
+    if (req.cookies.jwt) {
+        try {
+            const decode = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_PRIVATE_KEY);
+
+            const currentUser = await User.findById(decode.id);
+            if (!currentUser) {
+                return next();
+            }
+
+            if (currentUser.checkForUpdatedPasswords(decode.iat)) {
+                return next();
+            }
+
+            res.locals.user = currentUser;
+            return next();
+        } catch (error) {
+            return next()
+        } 
+    }
+    next();
+};
+
 const restrict = (...roles) => {
     return (req, res, next) => {
         if(!roles.includes(req.user.role)) {
@@ -75,7 +100,8 @@ const authenticate = {
     signUp,
     login,
     protect,
-    restrict
+    restrict,
+    isLoggedIn
 }
 
 module.exports = authenticate;

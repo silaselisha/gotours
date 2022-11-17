@@ -1,6 +1,7 @@
 const path = require('path');
 
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
@@ -22,6 +23,7 @@ app.use(cors());
 app.use(xss());
 app.use(express.json({limit: '10kb'}));
 app.use(mongoSanitize());
+app.use(cookieParser());
 app.use(hpp({
     whitelist: ['duration', 'ratingsAverage', 'ratingsQuantity', 'price', 'maxGroupSize', 'difficulty']
 }));

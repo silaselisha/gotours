@@ -933,7 +933,7 @@ body {
 .nav__el:focus {
   outline: none;
 }
-.nav__el--cta {
+.nav__el--cta, .nav__el--logout {
   padding: 1rem 3rem;
   border-radius: 10rem;
   border: 1px solid currentColor !important;

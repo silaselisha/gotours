@@ -27,27 +27,40 @@ const handleTokenExpiredError = () => new AppError('Invalid token! Please login 
 
 const handleJsonWebTokenError = () => new AppError('Invalid token! Please login or signup.', 401);
 
-const sendToClient = (err, res) => {
-    if(err.isOperational) {
-        res.status(err.statusCode).json({
-            status: err.status,
-            message: err.message
-        });
-    }else {
-        console.error(err)
-        res.status(500).json({
+const sendToClient = (err, req, res) => {
+    if(req.originalUrl.startsWith('/api')) {
+        if(err.isOperational) {
+          return  res.status(err.statusCode).json({
+                status: err.status,
+                message: err.message
+            });
+        }
+        console.error(err);
+        return res.status(500).json({
             status: 'error',
             message: 'Internal server error'
         });
     }
+
+    return res.status(err.statusCode).render('error', {
+        title: 'Page not found!',
+        msg: err.message
+    });
 }
 
-const sentToDeveloper = (err, res) => {
-    res.status(err.statusCode).json({
-        status: err.status,
-        message: err.message,
-        error: err,
-        stack: err.stack,
+const sentToDeveloper = (err, req, res) => {
+    if(req.originalUrl.startsWith('/api')) {
+       return  res.status(err.statusCode).json({
+            status: err.status,
+            message: err.message,
+            error: err,
+            stack: err.stack,
+        });
+    }
+
+    return res.status(err.statusCode).render('error', {
+        title: 'Page not found!',
+        msg: err.message
     });
 }
 
@@ -56,7 +69,7 @@ const errorHandler = (err, req, res, next) => {
     err.status = err.status || 'error';
 
     if(process.env.NODE_ENV === 'development') {
-        sentToDeveloper(err, res);
+        sentToDeveloper(err, req, res);
     } else if (process.env.NODE_ENV === 'production') {
         let error = {...err};
         if (error.name === 'CastError') error = handleCastError(err);

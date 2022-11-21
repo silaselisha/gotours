@@ -33,9 +33,17 @@ const signupHandler = catchAsync(async (req, res, next) => {
     });
 });
 
+const myAccountHandler = catchAsync(async (req, res, next) => {
+
+    res.status(200).render('account', {
+        title: 'My account',
+    });
+});
+
 module.exports = {
     overviewHandler,
     tourHandler,
     loginHandler,
-    signupHandler
+    signupHandler,
+    myAccountHandler
 }

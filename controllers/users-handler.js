@@ -1,7 +1,6 @@
-const path = require('path');
-
 const crypto = require('crypto');
 const multer = require('multer');
+const sharp = require('sharp');
 
 const User = require('../models/user-modle');
 const AppError = require('../utils/app-errors');
@@ -14,17 +13,18 @@ const sendToken = require('../utils/send-token');
  * @middlewares
  *@Images upload using multer
  */
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'public/img/users');
-    },
-    filename: function(req, file, cb) {
-        const ext = file.mimetype.split('/')[1];
-        const id = `${req.user.id}`.slice(0, 5)
+// const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         cb(null, 'public/img/users');
+//     },
+//     filename: function(req, file, cb) {
+//         const ext = file.mimetype.split('/')[1];
+//         const id = `${req.user.id}`.slice(0, 5)
 
-        cb(null, `user-${id}.${ext}`);
-    }
-});
+//         cb(null, `user-${id}.${ext}`);
+//     }
+// });
+const storage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
     if(file.mimetype.startsWith('image')){
@@ -38,6 +38,17 @@ const upload = multer({
     storage: storage,
     fileFilter: multerFilter
 }).single('photo');
+
+const imageResize = (req, res, next) => {
+    if(!req.file) return next();
+
+    const id = `${req.user.id}`.slice(0, 5);
+    req.filename = `user-${id}.jpg`;
+
+    sharp(req.file.buffer).resize(500, 500).toFormat('jpg').jpeg({quality: 90}).toFile(`public/img/users/${req.filename}`);
+
+    next();
+}
 
 const getUsers = catchAsync(async (req, res, next) => {
     const users = await User.find({});
@@ -172,7 +183,7 @@ const updateUsersData = catchAsync(async (req, res, next) => {
     }
     
     const sanitizedDataObject = dataSanitizer(req.body, 'name', 'email');
-    
+
     if(req.file) sanitizedDataObject.photo = req.file.filename;
 
     const user = await User.findByIdAndUpdate(req.user._id, sanitizedDataObject, {
@@ -236,7 +247,8 @@ const usersHandlers = {
     deleteAccount,
     myAccount,
     logout,
-    upload
+    upload,
+    imageResize
 };
 
 module.exports = usersHandlers;

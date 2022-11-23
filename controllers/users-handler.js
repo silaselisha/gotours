@@ -42,8 +42,8 @@ const upload = multer({
 const imageResize = (req, res, next) => {
     if(!req.file) return next();
 
-    const id = `${req.user.id}`.slice(0, 5);
-    req.filename = `user-${id}.jpg`;
+    const id = `${req.user.id}`.slice(0, 9);
+    req.file.filename = `user-${id}.jpeg`;
 
     sharp(req.file.buffer).resize(500, 500).toFormat('jpg').jpeg({quality: 90}).toFile(`public/img/users/${req.filename}`);
 

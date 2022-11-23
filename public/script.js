@@ -7,8 +7,9 @@ const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-settings');
 const passwordCurrent = document.querySelector('#password-current');
 const passwordConfirm = document.querySelector('#password-confirm');
-const button = document.querySelector('.btn--save')
-const savePassword = document.querySelector('.btn--save-password')
+const button = document.querySelector('.btn--save');
+const userPhoto = document.querySelector('#photo');
+
 
 const hideAlert = () => {
     const component = document.querySelector('.alert')
@@ -122,7 +123,7 @@ const updateUsersData = async (email, name) => {
     }
 }
 
-const updateSettings = async (data, type) => {
+const updateSettings = async(data, type) => {
     try {
         const URL =
             type === 'password'
@@ -203,17 +204,25 @@ if (logoutBtn)
 });
 
 if(userDataForm)
-    button.addEventListener('click', async (e) => {
+    userDataForm.addEventListener('submit', async (e) => {
         e.preventDefault()
+        const form = new FormData();
+
         const emailValue = email.value;
         const nameValue = userName.value;
-        console.log(emailValue)
+        const photoValue = userPhoto.files[0];
 
-        await updateSettings({email: emailValue, name: nameValue}, 'data');
+        form.append('name', nameValue);
+        form.append('email', emailValue);
+        form.append('photo', photoValue);
+
+        console.log(form)
+
+        await updateSettings(form, 'data');
     });
 
 if (userPasswordForm)
-    savePassword.addEventListener('click', async (e) => {
+    userPasswordForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const currentPass = passwordCurrent.value;
         const newPassword = password.value;

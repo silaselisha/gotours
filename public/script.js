@@ -8,6 +8,7 @@ const userPasswordForm = document.querySelector('.form-user-settings');
 const passwordCurrent = document.querySelector('#password-current');
 const passwordConfirm = document.querySelector('#password-confirm');
 const button = document.querySelector('.btn--save')
+const savePassword = document.querySelector('.btn--save-password')
 
 const hideAlert = () => {
     const component = document.querySelector('.alert')
@@ -99,6 +100,50 @@ const logout = async () => {
     }
 }
 
+const updateUsersData = async (email, name) => {
+    try {
+        const response = await axios({
+            method: 'PATCH',
+            url: '/api/v1/users/update-user-account',
+            data: {
+                email: email,
+                name: name
+            }
+        });
+        console.log(response)
+        const { data } = response
+
+        if (data.status === 'success') {
+            showAlert('success', 'User data updated successfully .')
+        }
+    } catch (err) {
+        console.log(err)
+        showAlert('error', err.response.data.message)
+    }
+}
+
+const updateSettings = async (data, type) => {
+    try {
+        const URL =
+            type === 'password'
+                ? '/api/v1/users/update-password'
+                : '/api/v1/users/update-user-account';
+
+        const response = await axios({
+            method: 'PATCH',
+            url: URL,
+            data: data
+        })
+
+        if (response.data.status === 'success') {
+            showAlert('success', `User ${type.toUpperCase()} Successfully updated.`)
+            location.reload()
+        }
+
+    } catch (err) {
+        showAlert('error', 'Personal data unsuccessfully saved.')
+    }
+}
 
 const locationsEl = document.getElementById('map');
 
@@ -156,3 +201,29 @@ if (logoutBtn)
     logoutBtn.addEventListener('click', (e) => {
     logout()
 });
+
+if(userDataForm)
+    button.addEventListener('click', async (e) => {
+        e.preventDefault()
+        const emailValue = email.value;
+        const nameValue = userName.value;
+        console.log(emailValue)
+
+        await updateSettings({email: emailValue, name: nameValue}, 'data');
+    });
+
+if (userPasswordForm)
+    savePassword.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const currentPass = passwordCurrent.value;
+        const newPassword = password.value;
+        const confirmNewPassword = passwordConfirm.value;
+
+        const data = {
+            currentPassword: currentPass,
+            password: newPassword,
+            confirmPassword: confirmNewPassword
+        }
+
+        await updateSettings(data, 'password');
+    });

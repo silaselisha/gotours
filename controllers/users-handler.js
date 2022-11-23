@@ -1,12 +1,43 @@
+const path = require('path');
+
 const crypto = require('crypto');
+const multer = require('multer');
 
 const User = require('../models/user-modle');
 const AppError = require('../utils/app-errors');
 const catchAsync = require('../utils/catch-async');
 const sendMail = require('../utils/send-mails');
-const jwtTokenGen = require('../utils/jwt-gen');
 const dataSanitizer = require('../utils/data-filter');
 const sendToken = require('../utils/send-token');
+
+/**
+ * @middlewares
+ *@Images upload using multer
+ */
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/img/users');
+    },
+    filename: function(req, file, cb) {
+        const ext = file.mimetype.split('/')[1];
+        const id = `${req.user.id}`.slice(0, 5)
+
+        cb(null, `user-${id}.${ext}`);
+    }
+});
+
+const multerFilter = (req, file, cb) => {
+    if(file.mimetype.startsWith('image')){
+        cb(null, true)
+    }else {
+        cb(new AppError('Please upload an image omly!', 400), false);
+    }
+}
+
+const upload = multer({
+    storage: storage,
+    fileFilter: multerFilter
+}).single('photo');
 
 const getUsers = catchAsync(async (req, res, next) => {
     const users = await User.find({});
@@ -141,6 +172,8 @@ const updateUsersData = catchAsync(async (req, res, next) => {
     }
     
     const sanitizedDataObject = dataSanitizer(req.body, 'name', 'email');
+    
+    if(req.file) sanitizedDataObject.photo = req.file.filename;
 
     const user = await User.findByIdAndUpdate(req.user._id, sanitizedDataObject, {
         runValidators: true,
@@ -202,7 +235,8 @@ const usersHandlers = {
     updateUsersData,
     deleteAccount,
     myAccount,
-    logout
+    logout,
+    upload
 };
 
 module.exports = usersHandlers;

@@ -5,7 +5,7 @@ const reviewsRouter = require('./reviews');
 const {protect, restrict} = authenticate;
 
 const toursHandlers = require('../controllers/tours-handler');
-const {createTour, cheapTopFiveTours,deleteTour, getAllTours, getTour, getStats, getToursMonthlyPlan,updateTour, getToursWithin, getToursNearMe} = toursHandlers;
+const {createTour, cheapTopFiveTours,deleteTour, getAllTours, getTour, getStats, getToursMonthlyPlan,updateTour, getToursWithin, getToursNearMe, upload, imageResize} = toursHandlers;
 
 const router = express.Router();
 
@@ -31,7 +31,7 @@ router.route('/')
 
 router.route('/:tourId')
     .get(getTour)
-    .patch(protect, restrict('admin', 'lead-guide'), updateTour)
+    .patch(protect, restrict('admin', 'lead-guide'), upload, imageResize, updateTour)
     .delete(protect, restrict('admin', 'lead-guide'), deleteTour)
 
 module.exports = router;

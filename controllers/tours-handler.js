@@ -1,7 +1,55 @@
+const multer = require('multer');
+const sharp = require('sharp');
+
 const Tour = require('../models/tour-model');
 const catchAsync = require('../utils/catch-async');
 const AppError = require('../utils/app-errors');
 const ApiFeatures = require('../utils/api-features');
+
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @middleware {*} image upload
+ * @middleware {*} image resize
+ */
+const storage = multer.memoryStorage();
+
+const fileFilter = (req, file, cb) => {
+    if(file.mimeType.startsWith('image')) {
+        cb(null, true)
+    }else {
+        cb(new AppError('Please upload images only!', 400));
+    }
+}
+
+const upload = multer({
+    storage: storage,
+    fileFilter: fileFilter
+}).fields([
+    { name: 'imageCover', maxCount: 1 },
+    { name: 'images', maxCount: 3 }
+]);
+
+const imageResize = (catchAsync(async (req, res, next) => {
+    if(!req.files.imageCover || !req.files.images) return next();
+
+    req.body.imageCover = await sharp(req.files.imageCover[0].buffer).resize(2000, 1333).toFormat('jpg').jpeg({ quality: 90 }).toFile(`pulic/img/tours/tour-${req.params.tourId}-cover.jpeg`)
+
+    req.body.images = [];
+
+    await Promise.all(
+        req.files.images.map(async (file, index) => {
+            const fileName = `tour-${req.params.tourId}-cover${index + 1}.jpeg`;
+
+            await sharp(file.buffer).resize().toFormat('jpg').jpeg({quality: 90}).toFile(`pulic/img/tours/${fileName}`);
+
+            req.body.images.push(fileName);
+        })
+    )
+    next();
+}));
 
 const cheapTopFiveTours = ((req, res, next) => {
     const limit = 5;
@@ -203,7 +251,9 @@ const toursHandlers = {
     updateTour,
     deleteTour,
     createTour,
-    cheapTopFiveTours
+    cheapTopFiveTours,
+    upload,
+    imageResize
 }
 
 module.exports = toursHandlers;

@@ -9,7 +9,7 @@ const passwordCurrent = document.querySelector('#password-current');
 const passwordConfirm = document.querySelector('#password-confirm');
 const button = document.querySelector('.btn--save');
 const userPhoto = document.querySelector('#photo');
-
+const bookTour = document.querySelector('#book--tour');
 
 const hideAlert = () => {
     const component = document.querySelector('.alert')
@@ -235,4 +235,31 @@ if (userPasswordForm)
         }
 
         await updateSettings(data, 'password');
+    });
+
+/**
+ * @stripe payment intergration
+ * @checkout session get
+ */
+const stripe = Stripe('pk_test_51M7adDF35gas8zhGif8wCO2WuYWuukZrCmkaAszVo5fnCUCqTJ5Evpti6oe0mMx3OrACuiRZMSr9RRZ3ZXHZTmZA00BO2gjRT5')
+
+const bookingTour = async (tourId) => {
+    try {
+        const session = await axios({
+            method: 'GET',
+            url: `/api/v1/bookings/checkout-session/${tourId}`
+        });
+    
+        await stripe.redirectToCheckout({
+            sessionId: session.data.data.id
+        });
+    } catch (error) {
+        showAlert('error', 'Could not process your payment, please try agin later!');
+    }
+}
+
+if(bookTour) 
+    bookTour.addEventListener('click', async (e) => {
+        const {tourId} = e.target.dataset;
+        await bookingTour(tourId)
     });

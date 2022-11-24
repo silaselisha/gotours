@@ -14,8 +14,10 @@ const toursRouter = require('./routes/tours');
 const usersRouter = require('./routes/users');
 const reviewsRouter = require('./routes/reviews');
 const routesRouter = require('./routes/routes');
+const bookingRouter = require('./routes/booking');
 const errorHandler = require('./controllers/error-handler');
 const AppError = require('./utils/app-errors');
+const bookingHandler = require('./controllers/booking-handler');
 const app = express();
 
 app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
@@ -51,6 +53,7 @@ app.use('/api', rateLimiter);
 app.use('/api/v1/tours', toursRouter);
 app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/reviews', reviewsRouter);
+app.use('/api/v1/bookings', bookingRouter);
 
 app.use('*', (req, res, next) => {
     next(new AppError('Route not implemented', 500));

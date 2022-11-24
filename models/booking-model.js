@@ -31,7 +31,7 @@ const bookingSchema = new mongoose.Schema({
 /**
  *@query_middleware hooks (pre|post)
  */
-bookingSchema.post(/^find/, function(next) {
+bookingSchema.pre(/^find/, function(next) {
     this.populate('user').populate({
         path: 'tour',
         select: 'name, price'

@@ -1,4 +1,5 @@
 const Tour = require('../models/tour-model');
+const Booking = require('../models/booking-model');
 const catchAsync = require("../utils/catch-async");
 
 const overviewHandler = catchAsync(async (req, res, next) => {
@@ -40,10 +41,24 @@ const myAccountHandler = catchAsync(async (req, res, next) => {
     });
 });
 
+const myBookedTours = catchAsync(async (req, res, next) => {
+    const userId = req.user.id
+    const bookings = await Booking.find({user: userId});
+
+    const tourIds = bookings.map(item => item.tour._id);
+    const tours = await Tour.find({_id: {$in: tourIds}});
+
+    res.status(200).render('overview', {
+        title: 'My tours',
+        tours
+    });
+});
+
 module.exports = {
     overviewHandler,
     tourHandler,
     loginHandler,
     signupHandler,
-    myAccountHandler
+    myAccountHandler,
+    myBookedTours
 }

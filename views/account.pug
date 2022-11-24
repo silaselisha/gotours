@@ -1,5 +1,5 @@
 extend base
-mixin sideItems(links, text, icon, active)
+mixin sideItems(link, text, icon, active)
   li(class=`${active}`)
     a(href=`${link}`)
       svg
@@ -12,7 +12,7 @@ block content
       nav.user-view__menu
         ul.side-nav
           +sideItems('#', 'Settings', 'icon-settings', 'side-nav--active')
-          +sideItems('#', 'My bookings', 'icon-briefcase')
+          +sideItems('my-booked-tours', 'My bookings', 'icon-briefcase')
           +sideItems('#', 'My reviews', 'icon-star')
           +sideItems('#', 'Billing', 'icon-credit-card')
         -if (user.role === 'admin')

@@ -216,8 +216,6 @@ if(userDataForm)
         form.append('email', emailValue);
         form.append('photo', photoValue);
 
-        console.log(form)
-
         await updateSettings(form, 'data');
     });
 
@@ -261,5 +259,6 @@ const bookingTour = async (tourId) => {
 if(bookTour) 
     bookTour.addEventListener('click', async (e) => {
         const {tourId} = e.target.dataset;
+        bookTour.textContent = 'Processing...'
         await bookingTour(tourId)
     });
